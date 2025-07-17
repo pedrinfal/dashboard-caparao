@@ -34,7 +34,7 @@ POP_OCUPADA_COL = "ÍNDICE DE POPUL. OCUPADA (IBGE/2022)"
 RENDA_PER_CAPITA_SM_COL = "MÉDIA DE RENDA PER CAPITA EM Nº DE SALÁRIOS MÍNIMOS (IBGE/2022)"
 
 # Colunas de 'Empregados por setor'
-SETOR_COL = "Setor"
+SETOR_COL = "Setor de Atuação"
 EMPREGADOS_SETOR_VAL_COL = "Total Empregados"
 
 # Colunas de 'Empregados por faixa etária'
