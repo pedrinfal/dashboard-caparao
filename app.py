@@ -42,7 +42,7 @@ def load_all_data():
             'geo_dados': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_GEO),
             'empregos_setor': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_EMPREGOS_SETOR),
             'empregos_faixa_etaria': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_EMPREGOS_FAIXA),
-            'empresas': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_EMPRESas),
+            'empresas': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_EMPRESAS),
             'instituicoes_ensino': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_INST_ENSINO),
             'ideb': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_IDEB),
             'instituicoes': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_INSTITUICOES),
