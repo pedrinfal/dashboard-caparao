@@ -10,16 +10,17 @@ from config import * # Importa todas as variáveis do config.py
 st.set_page_config(page_title="Resumo Caparaó", layout="wide")
 
 # --- Função para Carregar os Dados ---
-# A anotação @st.cache_data implementa o conceito de "lazy loading".
-# Isso significa que os dados são carregados do disco apenas uma vez, na primeira
-# execução. Em todas as interações seguintes, os dados são lidos rapidamente
-# da memória cache, otimizando o desempenho do aplicativo.
+# A anotação @st.cache_data implementa o lazy loading.
 @st.cache_data
 def load_all_data():
-    """Carrega, trata e retorna todos os DataFrames necessários para o dashboard."""
+    """
+    Carrega dados do cidades.csv e das diferentes abas do arquivo 
+    base_de_dados.xlsx.
+    """
     try:
-        # --- Cidades e Dados Demográficos ---
+        # --- Carrega o CSV principal ---
         df = pd.read_csv(CIDADES_FILE, sep=",", decimal=",")
+        # (Tratamento das colunas de cidades.csv)
         df[HABITANTES_COL] = df[HABITANTES_COL].astype(str).str.replace(".", "", regex=False).str.replace(",", ".", regex=False).astype(float)
         df[POP_ATIVA_COL] = df[POP_ATIVA_COL].astype(str).str.replace(".", "", regex=False).str.replace(",", ".", regex=False).astype(float)
         df[POP_ESTIMADA_COL] = df[POP_ESTIMADA_COL].astype(str).str.replace(".", "", regex=False).str.replace(",", ".", regex=False).astype(float)
@@ -35,16 +36,16 @@ def load_all_data():
             .astype(float)
         )
 
-        # --- Carregamento dos outros arquivos ---
+        # --- Carrega dados das ABAS do arquivo Excel ---
         data = {
             'cidades': df,
-            'empregos_setor': pd.read_csv(EMPREGADOS_SETOR_FILE),
-            'empregos_faixa_etaria': pd.read_csv(EMPREGADOS_FAIXA_ETARIA_FILE),
-            'empresas': pd.read_csv(EMPRESAS_SEGMENTO_FILE),
-            'instituicoes_ensino': pd.read_csv(INSTITUICOES_ENSINO_FILE),
-            'ideb': pd.read_csv(IDEB_FILE),
-            'instituicoes': pd.read_csv(INSTITUICOES_FILE),
-            'geo_dados': pd.read_csv(DADOS_GEOGRAFICOS_FILE)
+            'geo_dados': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_GEO),
+            'empregos_setor': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_EMPREGOS_SETOR),
+            'empregos_faixa_etaria': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_EMPREGOS_FAIXA),
+            'empresas': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_EMPRESas),
+            'instituicoes_ensino': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_INST_ENSINO),
+            'ideb': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_IDEB),
+            'instituicoes': pd.read_excel(BASE_DE_DADOS_XLSX_FILE, sheet_name=SHEET_INSTITUICOES),
         }
 
         # Carregar GeoJSON
@@ -55,13 +56,18 @@ def load_all_data():
         return data
 
     except FileNotFoundError as e:
-        st.error(f"Erro: Arquivo não encontrado - {e.filename}. Verifique se todos os arquivos (.csv e .geojson) estão na mesma pasta que o script 'app.py'.")
+        st.error(f"Erro: Arquivo não encontrado - {e.filename}. Verifique se os arquivos 'cidades.csv', 'base_de_dados.xlsx' e 'municipios_caparao.geojson' estão na mesma pasta que o script 'app.py'.")
+        return None
+    except ValueError as e:
+        st.error(f"Erro ao ler o arquivo Excel: {e}. Verifique se os nomes das abas no arquivo 'config.py' correspondem exatamente aos nomes das abas no seu arquivo 'base_de_dados.xlsx'.")
         return None
     except Exception as e:
-        st.error(f"Ocorreu um erro ao carregar os dados: {e}")
+        st.error(f"Ocorreu um erro inesperado ao carregar os dados: {e}")
         return None
 
-# --- Carregamento dos Dados ---
+# --- O restante do código permanece exatamente o mesmo ---
+# (O código abaixo é idêntico ao anterior, apenas a função de carregar dados mudou)
+
 data = load_all_data()
 
 if data:
@@ -161,7 +167,8 @@ if data:
     st.markdown("<hr style='margin-top:2em; margin-bottom:2em;'>", unsafe_allow_html=True)
     
     # --- SEÇÕES DE GRÁFICOS ---
-    
+    # (O restante do código para exibir os gráficos é idêntico e não precisa ser alterado)
+
     # --- GEOGRAFIA ---
     if not df_geo.empty:
         st.markdown("<h3 style='text-align:center;'>Concentração Geográfica</h3>", unsafe_allow_html=True)
@@ -170,7 +177,6 @@ if data:
         zona_rural_df = df_geo[df_geo[ZONA_COL] == 'Rural']
         zona_urbana = zona_urbana_df[PERCENTUAL_COL].values[0] if not zona_urbana_df.empty else 0
         zona_rural = zona_rural_df[PERCENTUAL_COL].values[0] if not zona_rural_df.empty else 0
-
 
         geo_df_pie = pd.DataFrame({'Zona': ['Urbana', 'Rural'], 'Valor': [zona_urbana, zona_rural]})
         fig_geo = px.pie(geo_df_pie, names='Zona', values='Valor', hole=0.5, color_discrete_sequence=['#1f77b4', '#2ca02c'])
@@ -185,7 +191,6 @@ if data:
         with col1: st.markdown(f'<div style="text-align: center;">🏙️ <b>ZONA URBANA</b><h3 style="color:#1f77b4;">{zona_urbana:.2f}%</h3></div>', unsafe_allow_html=True)
         with col2: st.markdown(f'<div style="text-align: center;">🏡 <b>ZONA RURAL</b><h3 style="color:#2ca02c;">{zona_rural:.2f}%</h3></div>', unsafe_allow_html=True)
         st.markdown("<hr style='margin-top:2em; margin-bottom:2em;'>", unsafe_allow_html=True)
-
 
     # --- ECONOMIA ---
     st.markdown("<h2 style='text-align:center;'>Economia e Mercado de Trabalho</h2>", unsafe_allow_html=True)
@@ -229,7 +234,6 @@ if data:
                 <div style='font-size:24px; font-weight: bold; color:#007bff;'>{valor}</div>
             </div>""", unsafe_allow_html=True)
         
-        # Contagem de instituições específicas
         ace_count = df_inst_cards[df_inst_cards[SUBCATEGORIA_INST_COL] == 'Aceleradora'].shape[0]
         cow_count = df_inst_cards[df_inst_cards[SUBCATEGORIA_INST_COL] == 'Coworking'].shape[0]
         inc_count = df_inst_cards[df_inst_cards[SUBCATEGORIA_INST_COL] == 'Incubadora'].shape[0]
