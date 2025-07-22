@@ -145,18 +145,18 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     kpi_card("IDH MÉDIO", f"{idh_medio:.2f}", "📈", "#FFA500")
 with col2:
-    kpi_card("PIB PER CAPITA", f"R$ {pib_per_capita:.2f}", "💰", "#28a745")
+    kpi_card("PIB PER CAPITA", f"R$ {pib_per_capita:,.2f}", "💰", "#28a745")
 with col3:
-    kpi_card("POP. ESTIMADA 2024", f"{pop_estimada:.0f}", "👥", "#007bff")
+    kpi_card("POP. ESTIMADA 2024", f"{pop_estimada:.3f}", "👥", "#007bff")
 with col4:
-    kpi_card("HABITANTES (CENSO)", f"{habitantes:.0f}", "🏡", "#6f42c1")
+    kpi_card("HABITANTES (CENSO)", f"{habitantes:.3f}", "🏡", "#6f42c1")
 
 # -----------------------------------------------------------------------------
 # LINHA 2 KPIs
 # -----------------------------------------------------------------------------
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    kpi_card("POP. IDADE ATIVA", f"{pop_idade_ativa:,.0f}", "💪", "#dc3545")
+    kpi_card("POP. IDADE ATIVA", f"{pop_idade_ativa:.3f}", "💪", "#dc3545")
 with col2:
     kpi_card("% POP. ATIVA", f"{perc_pop_ativa:.1f}%", "🧠", "#6c757d")
 with col3:
