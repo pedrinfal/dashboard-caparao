@@ -293,14 +293,35 @@ escolas_rede = pd.DataFrame({
 ideb_mean = df_ideb_sheet[["ANOS INICIAS", "ANOS FINAIS", "MÉDIO"]].mean()
 ideb_medio = pd.DataFrame({
     "Etapa de Ensino": ["Anos Iniciais", "Anos Finais", "Ensino Médio"],
-    "IDEB": [ideb_mean["ANOS INICIAS"], ideb_mean["ANOS FINAIS"], ideb_mean["MÉDIO"]]
+    "IDEB": [
+        round(ideb_mean["ANOS INICIAS"], 2),
+        round(ideb_mean["ANOS FINAIS"], 2),
+        round(ideb_mean["MÉDIO"], 2)
+    ]
 })
+
+fig_ideb = px.bar(
+    ideb_medio,
+    x="Etapa de Ensino",
+    y="IDEB",
+    color="Etapa de Ensino",
+    text="IDEB",
+    color_discrete_sequence=px.colors.qualitative.Set2
+)
+fig_ideb.update_traces(texttemplate="%{text:.2f}", textposition="outside")
+fig_ideb.update_layout(
+    xaxis_title="Etapa de Ensino",
+    yaxis_title="IDEB",
+    showlegend=False,
+    margin=dict(t=20, b=20)
+)
+st.plotly_chart(fig_ideb, use_container_width=True)
 
 # Instituições de Ensino por Nível (a partir da aba Instituições / Subcategoria)
 level_map = {
     "SUPERIOR": "Superior",
-    "TÉCNICA": "Tecnica",
-    "TECNICA": "Tecnica",
+    "TÉCNICA": "Tecnico",
+    "TECNICA": "Tecnico",
     "INFANTIL": "Infantil",
     "FUNDAMENTAL": "Fundamental",
     "MÉDIO": "Medio",
@@ -377,6 +398,7 @@ st.plotly_chart(fig_inst_cat, use_container_width=True)
 # =============================================================================
 # MAPA INTERATIVO
 # =============================================================================
+
 st.markdown("<h2 style='text-align:center;'>Mapa Interativo dos Municípios</h2>", unsafe_allow_html=True)
 if CIDADES_GEOJSON.exists():
     with open(CIDADES_GEOJSON, "r", encoding="utf-8") as f:
@@ -406,6 +428,7 @@ else:
 # =============================================================================
 # FILTRO POR MUNICÍPIO (DETALHES)
 # =============================================================================
+
 municipio_escolhido = st.selectbox(
     "Selecione o município para filtrar os dados:",
     options=df["MUNICIPIO"].unique()
@@ -418,6 +441,7 @@ if not df_filtrado.empty:
     # ------------------------------------------------------------------
     # EMPREGOS (municipal)
     # ------------------------------------------------------------------
+
     st.markdown("<h2 style='text-align:center;'>Economia e Mercado de Trabalho do Município</h2>", unsafe_allow_html=True)
     row_setor = df_emp_setor_sheet[df_emp_setor_sheet["MUNICIPIO"] == municipio_escolhido]
     if not row_setor.empty:
