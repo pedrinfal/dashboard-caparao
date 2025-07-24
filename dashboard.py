@@ -520,17 +520,19 @@ if not df_filtrado.empty:
     # ------------------------------------------------------------------
     # INSTITUIÇÕES (municipal)
     # ------------------------------------------------------------------
-    st.markdown("<h2 style='text-align:center;'>Instituições do Município</h2>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align:center; color: #0dcaf0;'>INSTITUIÇÕES DO MUNICÍPIO</h2>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center;'>Instituições por Categoria</h4>", unsafe_allow_html=True)
+
 inst_mun = df_instituicoes_sheet[df_instituicoes_sheet["MUNICIPIO"] == municipio_escolhido].copy()
 
 if not inst_mun.empty:
-    inst_mun["CATEGORIANORM"] = inst_mun["CATEGORIA"].map(strip_accents).str.upper().str.strip()
-    cat_counts_m = inst_mun.groupby("CATEGORIANORM").size()
-    cat_counts_m = cat_counts_m.reindex(_cat_order).fillna(0).astype(int)
-
+    _inst["CategoriaNorm"] = _inst["Categoria"].map(strip_accents).str.upper().str.strip()
+    _cat_order = ["ASSOCIACAO", "ECONOMIA", "EDUCACAO", "EMPREENDEDORISMO", "FOMENTO", "GOVERNO", "SINDICATO"]
+    cat_counts = _inst.groupby("CategoriaNorm").size()
+    cat_counts = cat_counts.reindex(_cat_order).fillna(0).astype(int)
     instituicoes_categoria_mun = pd.DataFrame({
-        "Categoria": cat_counts_m.index,
-        "Nº de Instituições": cat_counts_m.values
+        "Categoria": cat_counts.index,
+        "Nº de Instituições": cat_counts.values
     })
 else:
     instituicoes_categoria_mun = pd.DataFrame({"Categoria":[],"Nº de Instituições":[]})
@@ -540,7 +542,15 @@ fig_inst_cat_m = px.bar(
     x="Categoria",
     y="Nº de Instituições",
     color="Categoria",
-    text="Nº de Instituições"
+    text="Nº de Instituições",
+    color_discrete_sequence=["#4c78a8", "#f58518", "#00cc96", "#ab63fa", "#ffa15a", "#19d3f3", "#ff6692"]
 )
 fig_inst_cat_m.update_traces(textposition="outside")
+fig_inst_cat_m.update_layout(
+    xaxis_title="Categoria",
+    yaxis_title="Nº de Instituições",
+    showlegend=False,
+    margin=dict(t=20, b=20)
+)
 st.plotly_chart(fig_inst_cat_m, use_container_width=True)
+
