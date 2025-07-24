@@ -523,9 +523,9 @@ if not df_filtrado.empty:
 st.markdown("<h2 style='text-align:center; color: #0dcaf0;'>INSTITUIÇÕES DO MUNICÍPIO</h2>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align:center;'>Instituições por Categoria</h4>", unsafe_allow_html=True)
 
-inst_mun = df_instituicoes_sheet[df_instituicoes_sheet["MUNICIPIO"] == municipio_escolhido].copy()
+_inst = df_instituicoes_sheet[df_instituicoes_sheet["MUNICIPIO"] == municipio_escolhido].copy()
 
-if not inst_mun.empty:
+if not _inst.empty:
     _inst["CategoriaNorm"] = _inst["Categoria"].map(strip_accents).str.upper().str.strip()
     _cat_order = ["ASSOCIACAO", "ECONOMIA", "EDUCACAO", "EMPREENDEDORISMO", "FOMENTO", "GOVERNO", "SINDICATO"]
     cat_counts = _inst.groupby("CategoriaNorm").size()
