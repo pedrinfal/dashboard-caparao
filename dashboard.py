@@ -525,7 +525,7 @@ st.markdown("<h4 style='text-align:center;'>Instituições por Categoria</h4>", 
 
 # 🎯 PASSO 1: Filtre o DataFrame pelo município escolhido ANTES de qualquer outra coisa.
 # Esta é a única linha que você precisa mudar/adicionar ao seu código que já funciona.
-_inst = df_instituicoes_sheet[df_instituicoes_sheet["Cidade "] == municipio_escolhido].copy()
+_inst = df_instituicoes_sheet[df_instituicoes_sheet["Cidade"] == municipio_escolhido].copy()
 
 # O restante do seu código permanece exatamente o mesmo.
 if not _inst.empty:
