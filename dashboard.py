@@ -431,7 +431,7 @@ if not df_filtrado.empty:
     if not row_setor.empty:
         r = row_setor.fillna(0).iloc[0]
         empregos_setor_mun = pd.DataFrame({
-            "Setor": ["Agricultura", "Industria", "Comercio", "AdministracaoPublica", "Servicos"],
+            "Setor": ["Agricultura", "Indústria", "Comércio", "Administração Pública", "Serviços"],
             "Total Empregados": [r.get("AGRICULTURA",0), r.get("INDÚSTRIA",0), r.get("COMÉRCIO",0),
                                   r.get("ADMINISTRAÇÃO PÚBLICA",0), r.get("SERVIÇOS",0)]
         })
@@ -521,20 +521,26 @@ if not df_filtrado.empty:
     # INSTITUIÇÕES (municipal)
     # ------------------------------------------------------------------
     st.markdown("<h2 style='text-align:center;'>Instituições do Município</h2>", unsafe_allow_html=True)
-    inst_mun = df_instituicoes_sheet[df_instituicoes_sheet["MUNICIPIO"] == municipio_escolhido].copy()
-    if not inst_mun.empty:
-        inst_mun["CategoriaNorm"] = inst_mun["Categoria"].map(strip_accents).str.upper().str.strip()
-        cat_counts_m = inst_mun.groupby("CategoriaNorm").size()
-        cat_counts_m = cat_counts_m.reindex(_cat_order).fillna(0).astype(int)
-        instituicoes_categoria_mun = pd.DataFrame({"Categoria": cat_counts_m.index,
-                                                   "Nº de Instituições": cat_counts_m.values})
-    else:
-        instituicoes_categoria_mun = pd.DataFrame({"Categoria":[],"Nº de Instituições":[]})
+inst_mun = df_instituicoes_sheet[df_instituicoes_sheet["MUNICIPIO"] == municipio_escolhido].copy()
 
-    fig_inst_cat_m = px.bar(instituicoes_categoria_mun, x="Categoria", y="Nº de Instituições",
-                            color="Categoria", text="Nº de Instituições")
-    fig_inst_cat_m.update_traces(textposition="outside")
-    st.plotly_chart(fig_inst_cat_m, use_container_width=True)
+if not inst_mun.empty:
+    inst_mun["CATEGORIANORM"] = inst_mun["CATEGORIA"].map(strip_accents).str.upper().str.strip()
+    cat_counts_m = inst_mun.groupby("CATEGORIANORM").size()
+    cat_counts_m = cat_counts_m.reindex(_cat_order).fillna(0).astype(int)
 
+    instituicoes_categoria_mun = pd.DataFrame({
+        "Categoria": cat_counts_m.index,
+        "Nº de Instituições": cat_counts_m.values
+    })
 else:
-    st.warning("Município selecionado sem dados disponíveis.")
+    instituicoes_categoria_mun = pd.DataFrame({"Categoria":[],"Nº de Instituições":[]})
+
+fig_inst_cat_m = px.bar(
+    instituicoes_categoria_mun,
+    x="Categoria",
+    y="Nº de Instituições",
+    color="Categoria",
+    text="Nº de Instituições"
+)
+fig_inst_cat_m.update_traces(textposition="outside")
+st.plotly_chart(fig_inst_cat_m, use_container_width=True)
