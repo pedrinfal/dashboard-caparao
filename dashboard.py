@@ -47,14 +47,7 @@ df_emp_faixa_sheet   = load_sheet("Empregados por faixa etária")
 df_empresas_seg_sheet= load_sheet("Empresas por segmento")
 df_inst_ens_sheet    = load_sheet("Instituições de ensino")
 df_ideb_sheet        = load_sheet("Índices educacionais (IDEB)")
-df_instituicoes_sheet = pd.read_excel(xls, sheet_name="Instituições")
-df_instituicoes_sheet.columns = (
-    df_instituicoes_sheet.columns.str.upper()
-    .str.strip()
-    .str.normalize('NFKD')
-    .str.encode('ascii', errors='ignore')
-    .str.decode('utf-8')
-)
+df_instituicoes_sheet= load_sheet("Instituições")
 
 # =============================================================================
 # TRATAMENTO / LIMPEZA DOS DADOS DEMOGRÁFICOS PRINCIPAIS
@@ -523,40 +516,4 @@ if not df_filtrado.empty:
                             color="Etapa de Ensino", text="IDEB")
         fig_ideb_m.update_traces(textposition="outside")
         st.plotly_chart(fig_ideb_m, use_container_width=True)
-
-    # ------------------------------------------------------------------
-    # INSTITUIÇÕES (municipal)
-    # ------------------------------------------------------------------
-st.markdown("<h2 style='text-align:center; color: #0dcaf0;'>INSTITUIÇÕES DO MUNICÍPIO</h2>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align:center;'>Instituições por Categoria</h4>", unsafe_allow_html=True)
-
-inst_mun = df_instituicoes_sheet[df_instituicoes_sheet["MUNICIPIO"] == municipio_escolhido].copy()
-
-if not inst_mun.empty and "CATEGORIA" in inst_mun.columns:
-    inst_mun["CATEGORIANORM"] = inst_mun["CATEGORIA"].map(strip_accents).str.upper().str.strip()
-    _cat_order = ["ASSOCIACAO", "ECONOMIA", "EDUCACAO", "EMPREENDEDORISMO", "FOMENTO", "GOVERNO", "SINDICATO"]
-    cat_counts_m = inst_mun["CATEGORIANORM"].value_counts().reindex(_cat_order, fill_value=0).astype(int)
-    instituicoes_categoria_mun = pd.DataFrame({
-        "Categoria": cat_counts_m.index,
-        "Nº de Instituições": cat_counts_m.values
-    })
-else:
-    instituicoes_categoria_mun = pd.DataFrame({"Categoria":[],"Nº de Instituições":[]})
-
-fig_inst_cat_m = px.bar(
-    instituicoes_categoria_mun,
-    x="Categoria",
-    y="Nº de Instituições",
-    color="Categoria",
-    text="Nº de Instituições",
-    color_discrete_sequence=["#4c78a8", "#f58518", "#00cc96", "#ab63fa", "#ffa15a", "#19d3f3", "#ff6692"]
-)
-fig_inst_cat_m.update_traces(textposition="outside")
-fig_inst_cat_m.update_layout(
-    xaxis_title="Categoria",
-    yaxis_title="Nº de Instituições",
-    showlegend=False,
-    margin=dict(t=20, b=20)
-)
-st.plotly_chart(fig_inst_cat_m, use_container_width=True)
 
