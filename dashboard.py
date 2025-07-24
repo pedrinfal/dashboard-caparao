@@ -523,62 +523,39 @@ if not df_filtrado.empty:
 st.markdown("<h2 style='text-align:center; color: #0dcaf0;'>INSTITUIÇÕES DO MUNICÍPIO</h2>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align:center;'>Instituições por Categoria</h4>", unsafe_allow_html=True)
 
+# 🎯 PASSO 1: Filtre o DataFrame pelo município escolhido ANTES de qualquer outra coisa.
+# Esta é a única linha que você precisa mudar/adicionar ao seu código que já funciona.
+_inst = df_instituicoes_sheet[df_instituicoes_sheet["MUNICIPIO"] == municipio_escolhido].copy()
 
-inst_mun = df_instituicoes_sheet[df_instituicoes_sheet["MUNICIPIO"] == municipio_escolhido].copy()
-
-
-st.subheader("🔍 Análise de Depuração dos Dados")
-st.write(f"Município escolhido: **{municipio_escolhido}**")
-
-if inst_mun.empty:
-    st.warning("Nenhum dado encontrado para este município. O DataFrame `inst_mun` está vazio.")
-else:
-    st.success(f"Dados encontrados para {municipio_escolhido}. Total de {len(inst_mun)} registros.")
-    st.write("Amostra dos dados filtrados (`inst_mun`):")
-    st.dataframe(inst_mun.head())
-    st.write("Colunas disponíveis:", inst_mun.columns.tolist())
-
-
-if not inst_mun.empty and "CATEGORIA" in inst_mun.columns:
-    inst_mun["CATEGORIANORM"] = inst_mun["CATEGORIA"].map(strip_accents).str.upper().str.strip()
-    
-    
-    st.write("Valores únicos na coluna 'CATEGORIANORM':", inst_mun["CATEGORIANORM"].unique().tolist())
-    
+# O restante do seu código permanece exatamente o mesmo.
+if not _inst.empty:
+    _inst["CategoriaNorm"] = _inst["Categoria"].map(strip_accents).str.upper().str.strip()
     _cat_order = ["ASSOCIACAO", "ECONOMIA", "EDUCACAO", "EMPREENDEDORISMO", "FOMENTO", "GOVERNO", "SINDICATO"]
-    st.write("Ordem de categorias esperada (`_cat_order`):", _cat_order)
     
-    cat_counts_m = inst_mun["CATEGORIANORM"].value_counts().reindex(_cat_order, fill_value=0).astype(int)
+    cat_counts = _inst.groupby("CategoriaNorm").size()
+    cat_counts = cat_counts.reindex(_cat_order, fill_value=0).astype(int) # Usar fill_value=0 é mais seguro que .fillna(0) aqui
     
-    instituicoes_categoria_mun = pd.DataFrame({
-        "Categoria": cat_counts_m.index,
-        "Nº de Instituições": cat_counts_m.values
+    instituicoes_categoria = pd.DataFrame({
+        "Categoria": cat_counts.index,
+        "Nº de Instituições": cat_counts.values
     })
     
-    st.write("DataFrame final para o gráfico (`instituicoes_categoria_mun`):")
-    st.dataframe(instituicoes_categoria_mun)
-    
+    fig_inst_cat = px.bar(
+        instituicoes_categoria, 
+        x="Categoria", 
+        y="Nº de Instituições",
+        color="Categoria", 
+        text="Nº de Instituições",
+        color_discrete_sequence=["#4c78a8", "#f58518", "#00cc96", "#ab63fa", "#ffa15a", "#19d3f3", "#ff6692"]
+    )
+    fig_inst_cat.update_traces(textposition="outside")
+    fig_inst_cat.update_layout(
+        xaxis_title="Categoria",
+        yaxis_title="Nº de Instituições",
+        showlegend=False,
+        margin=dict(t=20, b=20)
+    )
+    st.plotly_chart(fig_inst_cat, use_container_width=True)
 else:
-    
-    st.error("O DataFrame está vazio ou a coluna 'CATEGORIA' não foi encontrada. Criando um DataFrame vazio para o gráfico.")
-    instituicoes_categoria_mun = pd.DataFrame({"Categoria":[], "Nº de Instituições":[]})
-
-
-st.subheader("📊 Gráfico Resultante")
-fig_inst_cat_m = px.bar(
-    instituicoes_categoria_mun,
-    x="Categoria",
-    y="Nº de Instituições",
-    color="Categoria",
-    text="Nº de Instituições",
-    color_discrete_sequence=["#4c78a8", "#f58518", "#00cc96", "#ab63fa", "#ffa15a", "#19d3f3", "#ff6692"]
-)
-fig_inst_cat_m.update_traces(textposition="outside")
-fig_inst_cat_m.update_layout(
-    xaxis_title="Categoria",
-    yaxis_title="Nº de Instituições",
-    showlegend=False,
-    margin=dict(t=20, b=20)
-)
-st.plotly_chart(fig_inst_cat_m, use_container_width=True)
-
+    # Mensagem para o caso de não haver instituições no município selecionado
+    st.warning(f"Não foram encontradas instituições para o município de {municipio_escolhido}.")
