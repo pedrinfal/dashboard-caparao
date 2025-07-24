@@ -47,7 +47,14 @@ df_emp_faixa_sheet   = load_sheet("Empregados por faixa etária")
 df_empresas_seg_sheet= load_sheet("Empresas por segmento")
 df_inst_ens_sheet    = load_sheet("Instituições de ensino")
 df_ideb_sheet        = load_sheet("Índices educacionais (IDEB)")
-df_instituicoes_sheet= load_sheet("Instituições")
+df_instituicoes_sheet = pd.read_excel(xls, sheet_name="Instituições")
+df_instituicoes_sheet.columns = (
+    df_instituicoes_sheet.columns.str.upper()
+    .str.strip()
+    .str.normalize('NFKD')
+    .str.encode('ascii', errors='ignore')
+    .str.decode('utf-8')
+)
 
 # =============================================================================
 # TRATAMENTO / LIMPEZA DOS DADOS DEMOGRÁFICOS PRINCIPAIS
