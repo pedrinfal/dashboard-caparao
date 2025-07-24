@@ -300,22 +300,6 @@ ideb_medio = pd.DataFrame({
     ]
 })
 
-fig_ideb = px.bar(
-    ideb_medio,
-    x="Etapa de Ensino",
-    y="IDEB",
-    color="Etapa de Ensino",
-    text="IDEB",
-    color_discrete_sequence=px.colors.qualitative.Set2
-)
-fig_ideb.update_traces(texttemplate="%{text:.2f}", textposition="outside")
-fig_ideb.update_layout(
-    xaxis_title="Etapa de Ensino",
-    yaxis_title="IDEB",
-    showlegend=False,
-    margin=dict(t=20, b=20)
-)
-st.plotly_chart(fig_ideb, use_container_width=True)
 
 # Instituições de Ensino por Nível (a partir da aba Instituições / Subcategoria)
 level_map = {
