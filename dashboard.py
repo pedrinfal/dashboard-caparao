@@ -523,17 +523,16 @@ if not df_filtrado.empty:
 st.markdown("<h2 style='text-align:center; color: #0dcaf0;'>INSTITUIÇÕES DO MUNICÍPIO</h2>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align:center;'>Instituições por Categoria</h4>", unsafe_allow_html=True)
 
-# 🎯 PASSO 1: Filtre o DataFrame pelo município escolhido ANTES de qualquer outra coisa.
-# Esta é a única linha que você precisa mudar/adicionar ao seu código que já funciona.
-_inst = df_instituicoes_sheet[df_instituicoes_sheet["Cidade"] == municipio_escolhido].copy()
 
-# O restante do seu código permanece exatamente o mesmo.
+_inst = df_instituicoes_sheet[df_instituicoes_sheet["Cidade "] == municipio_escolhido].copy()
+
+
 if not _inst.empty:
     _inst["CategoriaNorm"] = _inst["Categoria"].map(strip_accents).str.upper().str.strip()
     _cat_order = ["ASSOCIACAO", "ECONOMIA", "EDUCACAO", "EMPREENDEDORISMO", "FOMENTO", "GOVERNO", "SINDICATO"]
     
     cat_counts = _inst.groupby("CategoriaNorm").size()
-    cat_counts = cat_counts.reindex(_cat_order, fill_value=0).astype(int) # Usar fill_value=0 é mais seguro que .fillna(0) aqui
+    cat_counts = cat_counts.reindex(_cat_order, fill_value=0).astype(int) 
     
     instituicoes_categoria = pd.DataFrame({
         "Categoria": cat_counts.index,
@@ -557,5 +556,4 @@ if not _inst.empty:
     )
     st.plotly_chart(fig_inst_cat, use_container_width=True)
 else:
-    # Mensagem para o caso de não haver instituições no município selecionado
     st.warning(f"Não foram encontradas instituições para o município de {municipio_escolhido}.")
